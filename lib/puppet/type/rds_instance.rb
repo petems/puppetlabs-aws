@@ -15,6 +15,40 @@ Puppet::Type.newtype(:rds_instance) do
     end
   end
 
+  newparam(:db_name) do
+    desc 'The meaning of this parameter differs according to the database engine you use.
+
+Type: String
+
+MySQL
+
+The name of the database to create when the DB instance is created. If this parameter is not specified, no database is created in the DB instance.
+
+Constraints:
+
+Must contain 1 to 64 alphanumeric characters
+Cannot be a word reserved by the specified database engine
+PostgreSQL
+
+The name of the database to create when the DB instance is created. If this parameter is not specified, no database is created in the DB instance.
+
+Constraints:
+
+Must contain 1 to 63 alphanumeric characters
+Must begin with a letter or an underscore. Subsequent characters can be letters, underscores, or digits (0-9).
+Cannot be a word reserved by the specified database engine
+Oracle
+
+The Oracle System ID (SID) of the created DB instance.
+
+Default: ORCL
+
+Constraints:
+
+Cannot be longer than 8 characters
+SQL Server
+
+Not applicable. Must be null.'
     validate do |value|
     end
   end
