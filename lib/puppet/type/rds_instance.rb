@@ -9,8 +9,12 @@ Puppet::Type.newtype(:rds_instance) do
     end
   end
 
-  newparam(:db_name, namevar: true) do
-    desc 'the name of the db instance'
+  newparam(:name, namevar: true) do
+    desc 'the name of the db instance (also known as the db_instance_identifier)'
+    validate do |value|
+    end
+  end
+
     validate do |value|
     end
   end
