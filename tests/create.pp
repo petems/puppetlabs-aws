@@ -98,9 +98,4 @@ rds_instance { 'db-name-5':
   master_username => 'awsusername',
   master_user_password => 'the-master-password',
   multi_az => false,
-  tags            => {
-    department => 'engineering',
-    project    => 'cloud',
-    created_by => $id,
-  }
 }
