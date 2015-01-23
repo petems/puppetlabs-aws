@@ -122,4 +122,13 @@ Puppet::Type.type(:rds_instance).provide(:v2, :parent => PuppetX::Puppetlabs::Aw
     @property_hash[:ensure] = :absent
   end
 
+  def self.get_arn_for_instance(region, db_instance_identifier)
+    "arn:aws:rds:#{region}:#{account_number(region)}:db:#{db_instance_identifier}"
+  end
+
+  def self.account_number(region)
+    iam = ::Aws::IAM::Client.new({region: region})
+    iam.get_user.data.user.user_id
+  end
+
 end
