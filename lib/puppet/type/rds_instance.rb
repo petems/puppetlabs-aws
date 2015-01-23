@@ -80,7 +80,6 @@ Not applicable. Must be null.'
     desc 'the availability zone in which to place the instance'
     validate do |value|
       fail 'availability_zone_name should not contain spaces' if value =~ /\s/
-      fail 'availability_zone_name should not be blank' if value == ''
     end
   end
 
