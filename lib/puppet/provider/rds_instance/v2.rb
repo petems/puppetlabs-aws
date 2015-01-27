@@ -33,8 +33,6 @@ Puppet::Type.type(:rds_instance).provide(:v2, :parent => PuppetX::Puppetlabs::Aw
   end
 
   def self.db_instance_to_hash(region, instance)
-    tags = rds_client(region).list_tags_for_resource(resource_name: get_arn_for_instance(region,instance.db_instance_identifier))
-
     config = {
       ensure: :present,
       name: instance.db_instance_identifier,
@@ -48,7 +46,6 @@ Puppet::Type.type(:rds_instance).provide(:v2, :parent => PuppetX::Puppetlabs::Aw
       license_model: instance.license_model,
       multi_az: instance.multi_az,
       iops: instance.iops,
-      tags: tags.tag_list.map { |tag| {key: tag.key, value: tag.value} }
     }
     config
   end
@@ -85,28 +82,7 @@ Puppet::Type.type(:rds_instance).provide(:v2, :parent => PuppetX::Puppetlabs::Aw
     response = rds_client(resource[:region]).create_db_instance(config)
 
     @property_hash[:ensure] = :present
-    tags = resource[:tags] ? resource[:tags].map { |k,v| {key: k, value: v} } : []
-    tags << {key: 'Name', value: name}
-    response.each do |page|
-      Puppet.info("Adding tags to #{page}")
-    end
-    rds_client(resource[:region]).add_tags_to_resource(
-     resource_name: get_arn_for_instance(region,resource[:name]),
-     tags: tags)
   end
-
- def tags=(value)
-   Puppet.info("Updating tags for #{name} in region #{region}")
-   rds_client(resource[:region]).add_tags_to_resource(
-     resource_name: get_arn_for_instance(region,resource[:name]),
-     tags: value.collect { |k,v| { :key => k, :value => v } }
-   ) unless value.empty?
-   missing_tags = tags.keys - value.keys
-   rds_client(resource[:region]).delete_tags(
-     resource_name: get_arn_for_instance(region,resource[:name]),
-     tags: missing_tags.collect { |k| { :key => k } }
-   ) unless missing_tags.empty?
- end
 
   def destroy
     Puppet.info("Deleting instance #{name} in region #{resource[:region]}")
@@ -119,15 +95,6 @@ Puppet::Type.type(:rds_instance).provide(:v2, :parent => PuppetX::Puppetlabs::Aw
     }
     rds.delete_db_instance(config)
     @property_hash[:ensure] = :absent
-  end
-
-  def self.get_arn_for_instance(region, db_instance_identifier)
-    "arn:aws:rds:#{region}:#{account_number(region)}:db:#{db_instance_identifier}"
-  end
-
-  def self.account_number(region)
-    iam = ::Aws::IAM::Client.new({region: region})
-    iam.get_user.data.user.user_id
   end
 
 end
