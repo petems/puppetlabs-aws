@@ -17,7 +17,6 @@ Puppet::Type.newtype(:rds_instance) do
 
   newparam(:db_name) do
     desc 'The meaning of this parameter differs according to the database engine you use.
-
 Type: String
 
 MySQL
@@ -49,6 +48,8 @@ Cannot be longer than 8 characters
 SQL Server
 
 Not applicable. Must be null.'
+  newparam(:db_name, namevar: true) do
+    desc 'the name of the db instance'
     validate do |value|
     end
   end
