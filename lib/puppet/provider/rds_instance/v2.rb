@@ -127,7 +127,14 @@ Puppet::Type.type(:rds_instance).provide(:v2, :parent => PuppetX::Puppetlabs::Aw
 
   def self.account_number(region)
     iam = ::Aws::IAM::Client.new({region: region})
-    iam.get_user.data.user.user_id
+    begin
+      iam.get_user.data.user.user_id
+    rescue Aws::IAM::Errors::AccessDenied => e
+      # Hacky way to get account number for self
+      # Error message will say 'User: arn:aws:iam::12341234:user/peter.souter is not authorized
+      # We then use that error and get back the Account Number for self!
+      e.to_s.scan(/arn:aws:iam::(\d+):user/).first.first
+    end
   end
 
 end
